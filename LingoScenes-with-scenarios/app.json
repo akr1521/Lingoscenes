@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "LingoScenes",
+    "slug": "lingoscenes",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "lingoscenes",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#0F172A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lingoscenes.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "LingoScenes uses your microphone so you can record and replay vocabulary pronunciation."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.lingoscenes.app",
+      "permissions": ["RECORD_AUDIO"]
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "extra": {
+      "router": { "origin": false }
+    }
+  }
+}
