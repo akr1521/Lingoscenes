@@ -7,6 +7,8 @@ import { colors, gradient, radius, spacing, typography } from '@/theme';
 import { LEARNING_LANGUAGES } from '@/constants/languages';
 import { FlagMark } from '@/components/FlagMark';
 import { useAppStore } from '@/store/appStore';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
 
 const COOKIE_KEY = 'lingoscenes_cookie_pref';
 const FEATURED = LEARNING_LANGUAGES.filter((l) => ['de', 'es', 'fr'].includes(l.code));

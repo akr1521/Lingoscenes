@@ -10,8 +10,9 @@ import { Button } from '@/components/Button';
 
 export default function GoalsScreen() {
   const { onboardingDraft, setOnboardingField, clearOnboardingDraft } = useAppStore();
-  const { session, setProfile } = useAuthStore();
+  const { session, setProfile, reset } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const selected = onboardingDraft.dailyGoalMinutes;
 
@@ -37,6 +38,14 @@ export default function GoalsScreen() {
     setProfile(profile);
     clearOnboardingDraft();
     // Root layout's route guard will redirect to (tabs)/home once profile updates.
+  };
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    await authService.signOut();
+    reset();
+    setLogoutLoading(false);
+    // route guard sends signed-out users to the public landing page
   };
 
   return (
@@ -69,6 +78,14 @@ export default function GoalsScreen() {
         loading={loading}
         disabled={!selected}
         style={{ marginTop: spacing.xl }}
+      />
+
+      <Button
+        label="Sign out"
+        variant="secondary"
+        onPress={handleLogout}
+        loading={logoutLoading}
+        style={{ marginTop: spacing.md }}
       />
     </View>
   );

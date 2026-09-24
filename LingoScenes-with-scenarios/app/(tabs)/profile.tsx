@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radius } from '@/theme';
@@ -12,12 +12,21 @@ export default function ProfileScreen() {
   const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
   const reset = useAuthStore((s) => s.reset);
+  const [loading, setLoading] = useState(false);
 
   const language = LEARNING_LANGUAGES.find((l) => l.code === profile?.learning_language);
 
   const handleLogout = async () => {
-    await authService.signOut();
-    reset();
+    setLoading(true);
+    const { error } = await authService.signOut();
+    setLoading(false);
+    if (error) {
+      console.error('Logout error:', error);
+      // Still reset local state even if API call fails
+      reset();
+    } else {
+      reset();
+    }
     // route guard sends signed-out users to the public landing page
   };
 
@@ -39,7 +48,7 @@ export default function ProfileScreen() {
       </Card>
 
       <Button label="⚙️ Settings" variant="secondary" onPress={() => router.push('/settings')} />
-      <Button label="Log out" variant="danger" onPress={handleLogout} />
+      <Button label="Log out" variant="danger" onPress={handleLogout} loading={loading} />
     </ScrollView>
   );
 }
