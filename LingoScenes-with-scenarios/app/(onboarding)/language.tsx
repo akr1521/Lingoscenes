@@ -1,20 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radius } from '@/theme';
 import { LEARNING_LANGUAGES } from '@/constants/languages';
 import { useAppStore } from '@/store/appStore';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
 import { FlagMark } from '@/components/FlagMark';
-import {ProgressBar} from "@/components/ProgressBar";
+import { ProgressBar } from '@/components/ProgressBar';
+import { Button } from '@/components/Button';
 
 export default function LanguageSelectScreen() {
   const router = useRouter();
   const setOnboardingField = useAppStore((s) => s.setOnboardingField);
   const selected = useAppStore((s) => s.onboardingDraft.learningLanguage);
+  const reset = useAuthStore((s) => s.reset);
+  const [loading, setLoading] = useState(false);
 
   const handleSelect = (code: string) => {
     setOnboardingField('learningLanguage', code);
     router.push('/(onboarding)/level');
+  };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    await authService.signOut();
+    reset();
+    setLoading(false);
+    // route guard sends signed-out users to the public landing page
   };
 
   return (
@@ -46,6 +59,10 @@ export default function LanguageSelectScreen() {
             </Pressable>
           );
         })}
+      </View>
+
+      <View style={styles.footer}>
+        <Button label="Sign out" variant="secondary" onPress={handleLogout} loading={loading} />
       </View>
     </ScrollView>
   );
@@ -82,4 +99,5 @@ const styles = StyleSheet.create({
   },
   flag: { fontSize: 32 },
   optionLabel: { ...typography.h3, textAlign: 'center' },
+  footer: { marginTop: spacing.xl },
 });
