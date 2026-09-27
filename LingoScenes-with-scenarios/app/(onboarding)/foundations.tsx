@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { colors, radius, spacing, typography } from '@/theme';
 import { useAppStore } from '@/store/appStore';
 import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
 import { AlphabetExplorer } from '@/components/AlphabetExplorer';
 import { SurvivalPhraseList } from '@/components/SurvivalPhraseList';
 import { foundationsService } from '@/services/foundationsService';
@@ -19,9 +20,19 @@ export default function OnboardingFoundationsScreen() {
   const router = useRouter();
   const language = useAppStore((s) => s.onboardingDraft.learningLanguage) ?? 'de';
   const session = useAuthStore((s) => s.session);
+  const reset = useAuthStore((s) => s.reset);
   const [section, setSection] = useState<'alphabet' | 'phrases'>('alphabet');
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const goToLevel = () => router.push('/(onboarding)/level');
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    await authService.signOut();
+    reset();
+    setLogoutLoading(false);
+    // route guard sends signed-out users to the public landing page
+  };
 
   const handleContinue = async () => {
     if (section === 'alphabet') {
@@ -69,6 +80,7 @@ export default function OnboardingFoundationsScreen() {
           onPress={handleContinue}
         />
         <Button label="Skip for now" onPress={goToLevel} variant="ghost" />
+        <Button label="Sign out" variant="secondary" onPress={handleLogout} loading={logoutLoading} />
       </View>
     </View>
   );

@@ -1,20 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, radius } from '@/theme';
 import { LEVELS } from '@/constants/languages';
 import { useAppStore } from '@/store/appStore';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
 import { ProgressBar } from '@/components/ProgressBar';
+import { Button } from '@/components/Button';
 
 export default function LevelSelectScreen() {
   const router = useRouter();
   const setOnboardingField = useAppStore((s) => s.setOnboardingField);
   const selected = useAppStore((s) => s.onboardingDraft.level);
+  const reset = useAuthStore((s) => s.reset);
+  const [loading, setLoading] = useState(false);
 
   const handleSelect = (code: typeof LEVELS[number]['code']) => {
     setOnboardingField('level', code);
     router.push('/(onboarding)/goals');
+  };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    await authService.signOut();
+    reset();
+    setLoading(false);
+    // route guard sends signed-out users to the public landing page
   };
 
   return (
@@ -51,6 +64,10 @@ export default function LevelSelectScreen() {
           </Pressable>
         ))}
       </View>
+
+      <View style={styles.footer}>
+        <Button label="Sign out" variant="secondary" onPress={handleLogout} loading={loading} />
+      </View>
     </View>
   );
 }
@@ -76,4 +93,5 @@ const styles = StyleSheet.create({
   optionContent: { flex: 1, gap: 4 },
   optionLabel: { ...typography.h3 },
   optionBlurb: { ...typography.bodyMuted, fontSize: 14 },
+  footer: { marginTop: spacing.xl },
 });

@@ -14,13 +14,23 @@ export default function SettingsScreen() {
   const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
   const setProfile = useAuthStore((s) => s.setProfile);
+  const reset = useAuthStore((s) => s.reset);
   const { playbackSpeed, setPlaybackSpeed, translationsVisible, toggleTranslations } = useAppStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const updateDailyGoal = async (minutes: number) => {
     if (!profile) return;
     await authService.updateProfile(profile.id, { daily_goal_minutes: minutes });
     setProfile({ ...profile, daily_goal_minutes: minutes });
+  };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    await authService.signOut();
+    reset();
+    setLoading(false);
+    // route guard sends signed-out users to the public landing page
   };
 
   return (
@@ -73,6 +83,7 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
+      <Button label="Log out" variant="danger" onPress={handleLogout} loading={loading} />
       <Button label="Close" variant="secondary" onPress={() => router.back()} />
     </ScrollView>
   );
